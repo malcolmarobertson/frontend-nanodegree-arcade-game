@@ -8,4 +8,4 @@ For detailed instructions on how to get started, check out this [guide](https://
 1. The site must be saved to a web server directory
 2. a Python webserver must be enabled using: 'python -m http.server'
 3. the website must be run in a browser using 'http://http://localhost:8000/'
-4. the game can be played using up, down, left & right directional arrows
+4. the game can be played using 

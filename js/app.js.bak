@@ -15,9 +15,9 @@ Enemy.prototype.update = function(dt) {
     // all computers.
 
     if (this.x > 505) {
-        this.x = -101;
+    	  this.x = -101;
     } else {
-        this.x = this.x + (this.speed * dt);
+    	  this.x = this.x + (this.speed * dt);
     }
 };
 // Draw the enemy on the screen, required method for game
@@ -32,17 +32,17 @@ Enemy.prototype.die = function() {
 }
 //return random entry of array
 function randomArrayEntry(inArray) {
-  return inArray[Math.floor(Math.random()*inArray.length)];
+	return inArray[Math.floor(Math.random()*inArray.length)];
 };
 //generate random row for enemy
 function randomRowY() {
-    var rows = Array(1, 2, 3);
+	  var rows = Array(1, 2, 3);
     return (randomArrayEntry(rows) * 83) - 23;
 };
 //generate random speed for enemy
 function randomSpeed() {
-    return (Math.random() * (11 - 1) + 1) * 50;
-    //return (Math.random() * (11 - 1) + 1);
+	  return (Math.random() * (11 - 1) + 1) * 50;
+	  //return (Math.random() * (11 - 1) + 1);
 };
 // Now write your own player class
 // This class requires an update(), render() and
@@ -63,31 +63,31 @@ Player.prototype.render = function() {
 };
 // move the player depending on which direction let is pressed
 Player.prototype.handleInput = function(dir) {
-  switch(dir) {
+	switch(dir) {
     case 'up':
         if (this.y > 0) {
-            this.y = this.y - 83;
-            if (this.y < 72) {
-                this.win();
-            }
+        	  this.y = this.y - 83;
+        	  if (this.y < 72) {
+        	      this.win();
+        	  }
         }
         break;
     case 'down':
         if (this.y < 400) {
-          this.y = this.y + 83;
+        	this.y = this.y + 83;
         }
         break;
     case 'left':
         if (this.x > 100) {
-          this.x = this.x - 101;
+        	this.x = this.x - 101;
         }
         break;
     case 'right':
         if (this.x < 400) {
-          this.x = this.x + 101;
+        	this.x = this.x + 101;
         }
         break;
-  }
+	}
 };
 //player dies
 Player.prototype.die = function() {
@@ -106,12 +106,12 @@ var Score = function() {
     this.score = 0;
 };
 Score.prototype.render = function() {
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, 505, 50);
+	  ctx.fillStyle = "white";
+	  ctx.fillRect(0, 0, 505, 50);
     ctx.font = "32pt arial";
-    ctx.fillStyle = "red";
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 1;
+  	ctx.fillStyle = "red";
+  	ctx.strokeStyle = "red";
+  	ctx.lineWidth = 1;
     ctx.strokeText('Score: ' + this.score, 10, 40);
     ctx.strokeRect(0, 0, 505, 50);
 };
@@ -173,8 +173,8 @@ checkCollisions = function() {
                 checkPointInRectangle(A, B, C, D, X) ||
                 checkPointInRectangle(A, B, C, D, Y) ||
                 checkPointInRectangle(A, B, C, D, Z)) {
-                enemy.die();
-                player.die();
+            	  enemy.die();
+            	  player.die();
 
             };
         }
@@ -182,41 +182,41 @@ checkCollisions = function() {
 };
 checkPointInRectangle = function(A, B, C, D, P){
 
-    //reference: https://martin-thoma.com/how-to-check-if-a-point-is-inside-a-rectangle/
-    //
-    //area of enemy rectangle, I could have used the simple rectangle aligned with x-y axis formula but
-    //this is fun and who knows, maybe I will need it :)
-    //           = 0.5           | (yA   - yC  )·(xD   - xB  )  +  (yB   - yD  )·(xA   - xC)|
-    var areaRect = 0.5 * Math.abs(((A[1] - C[1])*(D[0] - B[0])) + ((B[1] - D[1])*(A[0] - C[0])));
+	  //reference: https://martin-thoma.com/how-to-check-if-a-point-is-inside-a-rectangle/
+	  //
+	  //area of enemy rectangle, I could have used the simple rectangle aligned with x-y axis formula but
+	  //this is fun and who knows, maybe I will need it :)
+	  //           = 0.5           | (yA   - yC  )·(xD   - xB  )  +  (yB   - yD  )·(xA   - xC)|
+	  var areaRect = 0.5 * Math.abs(((A[1] - C[1])*(D[0] - B[0])) + ((B[1] - D[1])*(A[0] - C[0])));
 
-    // area of triangle
-    //      = 0.5
-    //    (x1 (y2-y3)
-    //  +  x2 (y3-y1)
-    //  +  x3 (y1-y2))
-    var ABP = 0.5 * Math.abs(
-          A[0] * (B[1] - P[1])
-        + B[0] * (P[1] - A[1])
-        + P[0] * (A[1] - B[1]));
+	  // area of triangle
+	  //      = 0.5
+	  //		(x1 (y2-y3)
+	  //	+  x2 (y3-y1)
+	  //	+  x3 (y1-y2))
+	  var ABP = 0.5 * Math.abs(
+	  		  A[0] * (B[1] - P[1])
+	  		+ B[0] * (P[1] - A[1])
+	  		+ P[0] * (A[1] - B[1]));
 
-    var BCP = 0.5 * Math.abs(
-          (B[0] * (C[1] - P[1]))
-        + (C[0] * (P[1] - B[1]))
-        + (P[0] * (B[1] - C[1])));
+	  var BCP = 0.5 * Math.abs(
+	  		  (B[0] * (C[1] - P[1]))
+	  		+ (C[0] * (P[1] - B[1]))
+	  		+ (P[0] * (B[1] - C[1])));
 
-    var CDP = 0.5 * Math.abs(
-          (C[0] * (D[1] - P[1]))
-        + (D[0] * (P[1] - C[1]))
-        + (P[0] * (C[1] - D[1])));
+	  var CDP = 0.5 * Math.abs(
+	  		  (C[0] * (D[1] - P[1]))
+	  		+ (D[0] * (P[1] - C[1]))
+	  		+ (P[0] * (C[1] - D[1])));
 
-    var DAP = 0.5 * Math.abs(
-          (D[0] * (A[1] - P[1]))
-        + (A[0] * (P[1] - D[1]))
-        + (P[0] * (D[1] - A[1])));
+	  var DAP = 0.5 * Math.abs(
+	  		  (D[0] * (A[1] - P[1]))
+	  		+ (A[0] * (P[1] - D[1]))
+	  		+ (P[0] * (D[1] - A[1])));
 
-    var totTri = ABP+BCP+CDP+DAP;
+	  var totTri = ABP+BCP+CDP+DAP;
 
-    return areaRect == totTri;
+	  return areaRect == totTri;
 
 }
 
