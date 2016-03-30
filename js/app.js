@@ -1,21 +1,42 @@
+'use strict';
+
+var MAX_BLOCK_WIDTH = 101;
+var MAX_CANVAS_WIDTH = 505;
+var ROW_HEIGHT = 83;
+var ROW_HEIGHT_ADJUST = 23;
+var SPEED_ADJUST = 50;
+var PLAYER_START_X = 202;
+var PLAYER_START_Y = 404;
+var MIN_PLAYER_X = 100;
+var MIN_PLAYER_Y = 72;
+var MAX_PLAYER_X = 400;
+var MAX_PLAYER_Y = 400;
+var WIN_SCORE = 10;
+var ENEMY_ROW_HEIGHT_ADJUST = 71;
+var PLAYER_ROW_HEIGHT_ADJUST_1 = 61;
+var PLAYER_ROW_HEIGHT_ADJUST_2 = 55;
+
+//super class for game objects
+var GameObject = function (sprite, x, y) {
+    this.sprite = sprite;
+    this.x = x
+    this.y = y;
+};
 // Enemies our player must avoid
 var Enemy = function() {
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
-    this.x = -101;
-    this.y = randomRowY();
-    this.speed = randomSpeed();
+    GameObject.call(this, 'images/enemy-bug.png', -MAX_BLOCK_WIDTH, this.randomRowY());
+    this.speed = this.randomSpeed();
 };
+Enemy.prototype = Object.create(GameObject.prototype);
+Enemy.prototype.constructor = Enemy;
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-
-    if (this.x > 505) {
-        this.x = -101;
+    if (this.x > MAX_CANVAS_WIDTH) {
+        this.x = -MAX_BLOCK_WIDTH;
     } else {
         this.x = this.x + (this.speed * dt);
     }
@@ -24,34 +45,34 @@ Enemy.prototype.update = function(dt) {
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     ctx.strokeStyle = 'red';
-    //ctx.strokeRect(this.x, this.y+72, 101, 83);
+    //ctx.strokeRect(this.x, this.y+MIN_PLAYER_Y, MAX_BLOCK_WIDTH, ROW_HEIGHT);
 };
 //Enemy dies
 Enemy.prototype.die = function() {
-    this.x = -101;
-}
+    this.x = -MAX_BLOCK_WIDTH;
+};
 //return random entry of array
-function randomArrayEntry(inArray) {
+Enemy.prototype.randomArrayEntry = function(inArray) {
   return inArray[Math.floor(Math.random()*inArray.length)];
 };
 //generate random row for enemy
-function randomRowY() {
+Enemy.prototype.randomRowY = function() {
     var rows = Array(1, 2, 3);
-    return (randomArrayEntry(rows) * 83) - 23;
+    return (this.randomArrayEntry(rows) * ROW_HEIGHT) - ROW_HEIGHT_ADJUST;
 };
 //generate random speed for enemy
-function randomSpeed() {
-    return (Math.random() * (11 - 1) + 1) * 50;
+Enemy.prototype.randomSpeed = function() {
+    return (Math.random() * (11 - 1) + 1) * SPEED_ADJUST;
     //return (Math.random() * (11 - 1) + 1);
 };
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function() {
-    this.sprite = 'images/char-boy.png';
-    this.x = 202;
-    this.y = 404;
+    GameObject.call(this, 'images/char-boy.png', PLAYER_START_X, PLAYER_START_Y);
 };
+Player.prototype = Object.create(GameObject.prototype);
+Player.prototype.constructor = Player;
 //TODO area of the player's sprite which is collisionable
 //hotX = this.x + 10;
 //hotY = this.y + 10;
@@ -59,32 +80,32 @@ var Player = function() {
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     ctx.strokeStyle = 'green';
-    //ctx.strokeRect(this.x, this.y+61, 101, 83);
+    //ctx.strokeRect(this.x, this.y+61, MAX_BLOCK_WIDTH, ROW_HEIGHT);
 };
 // move the player depending on which direction let is pressed
 Player.prototype.handleInput = function(dir) {
   switch(dir) {
     case 'up':
         if (this.y > 0) {
-            this.y = this.y - 83;
-            if (this.y < 72) {
+            this.y = this.y - ROW_HEIGHT;
+            if (this.y < MIN_PLAYER_Y) {
                 this.win();
             }
         }
         break;
     case 'down':
-        if (this.y < 400) {
-          this.y = this.y + 83;
+        if (this.y < MAX_PLAYER_Y) {
+          this.y = this.y + ROW_HEIGHT;
         }
         break;
     case 'left':
-        if (this.x > 100) {
-          this.x = this.x - 101;
+        if (this.x > MIN_PLAYER_X) {
+          this.x = this.x - MAX_BLOCK_WIDTH;
         }
         break;
     case 'right':
-        if (this.x < 400) {
-          this.x = this.x + 101;
+        if (this.x < MAX_PLAYER_X) {
+          this.x = this.x + MAX_BLOCK_WIDTH;
         }
         break;
   }
@@ -92,28 +113,28 @@ Player.prototype.handleInput = function(dir) {
 //player dies
 Player.prototype.die = function() {
     score.decrease();
-    this.x = 202;
-    this.y = 404;
-}
+    this.x = PLAYER_START_X;
+    this.y = PLAYER_START_Y;
+};
 //player gets to water
 Player.prototype.win = function() {
     score.increase();
-    this.x = 202;
-    this.y = 404;
-}
+    this.x = PLAYER_START_X;
+    this.y = PLAYER_START_Y;
+};
 //Score
 var Score = function() {
     this.score = 0;
 };
 Score.prototype.render = function() {
     ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, 505, 50);
+    ctx.fillRect(0, 0, MAX_CANVAS_WIDTH, 50);
     ctx.font = "32pt arial";
     ctx.fillStyle = "red";
     ctx.strokeStyle = "red";
     ctx.lineWidth = 1;
     ctx.strokeText('Score: ' + this.score, 10, 40);
-    ctx.strokeRect(0, 0, 505, 50);
+    ctx.strokeRect(0, 0, MAX_CANVAS_WIDTH, 50);
 };
 //Score decrease
 Score.prototype.decrease = function() {
@@ -122,11 +143,9 @@ Score.prototype.decrease = function() {
 };
 //score increase
 Score.prototype.increase = function() {
-    this.score=+10;
+    this.score=+WIN_SCORE;
     this.render();
 };
-
-
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
@@ -155,68 +174,5 @@ document.addEventListener('keyup', function(e) {
     player.handleInput(allowedKeys[e.keyCode]);
 });
 
-checkCollisions = function() {
-    allEnemies.forEach(function(enemy) {
 
-        var A = [enemy.x, enemy.y + 71];
-        var B = [enemy.x + 101, enemy.y + 71];
-        var C = [enemy.x + 101, enemy.y + 83 + 71];
-        var D = [enemy.x, enemy.y + 83 + 71];
-
-        var W = [player.x, player.y + 61];
-        var X = [player.x + 101, player.y + 61];
-        var Y = [player.x + 101, player.y + 83 + 55];
-        var Z = [player.x, player.y + 83 + 55];
-
-        if (enemy.x > 0 && enemy.x < 505) {
-            if (checkPointInRectangle(A, B, C, D, W) ||
-                checkPointInRectangle(A, B, C, D, X) ||
-                checkPointInRectangle(A, B, C, D, Y) ||
-                checkPointInRectangle(A, B, C, D, Z)) {
-                enemy.die();
-                player.die();
-
-            };
-        }
-    });
-};
-checkPointInRectangle = function(A, B, C, D, P){
-
-    //reference: https://martin-thoma.com/how-to-check-if-a-point-is-inside-a-rectangle/
-    //
-    //area of enemy rectangle, I could have used the simple rectangle aligned with x-y axis formula but
-    //this is fun and who knows, maybe I will need it :)
-    //           = 0.5           | (yA   - yC  )·(xD   - xB  )  +  (yB   - yD  )·(xA   - xC)|
-    var areaRect = 0.5 * Math.abs(((A[1] - C[1])*(D[0] - B[0])) + ((B[1] - D[1])*(A[0] - C[0])));
-
-    // area of triangle
-    //      = 0.5
-    //    (x1 (y2-y3)
-    //  +  x2 (y3-y1)
-    //  +  x3 (y1-y2))
-    var ABP = 0.5 * Math.abs(
-          A[0] * (B[1] - P[1])
-        + B[0] * (P[1] - A[1])
-        + P[0] * (A[1] - B[1]));
-
-    var BCP = 0.5 * Math.abs(
-          (B[0] * (C[1] - P[1]))
-        + (C[0] * (P[1] - B[1]))
-        + (P[0] * (B[1] - C[1])));
-
-    var CDP = 0.5 * Math.abs(
-          (C[0] * (D[1] - P[1]))
-        + (D[0] * (P[1] - C[1]))
-        + (P[0] * (C[1] - D[1])));
-
-    var DAP = 0.5 * Math.abs(
-          (D[0] * (A[1] - P[1]))
-        + (A[0] * (P[1] - D[1]))
-        + (P[0] * (D[1] - A[1])));
-
-    var totTri = ABP+BCP+CDP+DAP;
-
-    return areaRect == totTri;
-
-}
 
